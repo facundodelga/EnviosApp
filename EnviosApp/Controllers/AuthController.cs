@@ -55,9 +55,9 @@ namespace EnviosApp.Controllers
             };
 
             var tokenConfig = tokenHandler.CreateToken(tokenDescriptor);
-            var token = tokenHandler.WriteToken(tokenConfig);
+            var tokenjwt = tokenHandler.WriteToken(tokenConfig);
             //devuelvo el token para almacenarlo en el navegador
-            return Ok(token);
+            return Ok(new { message = "Inicio de sesión exitoso", token = tokenjwt });
         }
 
         [HttpPost("logout")]

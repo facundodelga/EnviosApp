@@ -24,15 +24,24 @@ async function submitForm() {
         if (response.ok) {
             const result = await response.json();
             console.log('Inicio de sesión exitoso:', result);
-            setToken(result)
-            alert(result.message);
+            localStorage.setItem('jwt', result.token)
+            const code = () => alert(result.message);
+            code();
+            
         } else {
             const error = await response.json();
             console.error('Error en el inicio de sesión:', error);
-            alert(error.message || 'Error en el inicio de sesión');
+            const code = () => alert(error.message || 'Error en el inicio de sesión');
+            code();
+            
         }
+        
+        
+        
     } catch (error) {
         console.error('Error al enviar los datos:', error);
-        alert('Ocurrió un error al enviar los datos.');
+        const code = () => alert('Ocurrió un error al enviar los datos.');
+        code();
     }
 }
+

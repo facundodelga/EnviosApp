@@ -54,7 +54,7 @@
 <body>
 <div class="login-container">
     <h2>Iniciar Sesión</h2>
-    <form id="loginForm">
+    <form id="loginForm" onsubmit="submitForm(); return false;">
         <div class="form-group">
             <label for="username">Usuario</label>
             <input type="text" id="username" name="username" required>
