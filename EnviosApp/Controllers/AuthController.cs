@@ -1,8 +1,13 @@
 ﻿using EnviosApp.Models.DTOs;
 using EnviosApp.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace EnviosApp.Controllers
 {
@@ -17,18 +22,42 @@ namespace EnviosApp.Controllers
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO userDTO) {
+            string jwtKey = "jwt-key-delga-DESKTOP-2EUSJCE-Warning";
+
+
             if (userDTO.Username.IsNullOrEmpty() || userDTO.Password.IsNullOrEmpty()) {
-                return BadRequest();
+                return BadRequest("null parameters");
             }
+            
             var user = _userRepository.FindByUserName(userDTO.Username);
-            if (user == null)
-                return BadRequest();
+            if (user == null || user.Password != userDTO.Password)
+                return BadRequest("User notFound");
 
-            if (user.Password != userDTO.Password) { 
-                return BadRequest();
+            var claims = new List<Claim>();
+
+            //Me fijo si soy admin
+            if(userDTO.Username.Equals("Facundo") && userDTO.Password.Equals("123")) {
+                claims.Add(new Claim("admin", userDTO.Username));
             }
+            claims.Add(new Claim("user", userDTO.Username));
 
-            return Ok();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var byteKey = Encoding.UTF8.GetBytes(jwtKey);
+
+            var claimsIdentity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
+
+            var tokenDescriptor = new SecurityTokenDescriptor() {
+                Subject = claimsIdentity,
+                Expires = DateTime.UtcNow.AddMinutes(10),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(byteKey), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = "Envios-App-delga",
+                Audience = "Localhost"
+            };
+
+            var tokenConfig = tokenHandler.CreateToken(tokenDescriptor);
+            var token = tokenHandler.WriteToken(tokenConfig);
+            //devuelvo el token para almacenarlo en el navegador
+            return Ok(token);
         }
 
         [HttpPost("logout")]

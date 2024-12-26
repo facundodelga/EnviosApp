@@ -18,11 +18,13 @@ async function submitForm() {
             },
             body: JSON.stringify(jsonData),
         });
+        
 
         // Manejar la respuesta del servidor
         if (response.ok) {
             const result = await response.json();
             console.log('Inicio de sesión exitoso:', result);
+            setToken(result)
             alert(result.message);
         } else {
             const error = await response.json();
