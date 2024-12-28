@@ -36,7 +36,7 @@ namespace EnviosApp.Controllers
             var claims = new List<Claim>();
 
             //Me fijo si soy admin
-            if(loginDTO.Username.Equals("Facundo") && loginDTO.Password.Equals("123")) {
+            if(user.Role.Equals("admin")) {
                 claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin"));
             }
             claims.Add(new Claim("user", loginDTO.Username));

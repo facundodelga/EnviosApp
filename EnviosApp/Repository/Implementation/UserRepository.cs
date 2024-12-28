@@ -6,6 +6,17 @@ namespace EnviosApp.Repository.Implementation {
             
         }
 
+        public void UpdateUser(User user) {
+            Update(user);
+            SaveChanges();
+        
+        }
+
+        public void RemoveUser(User user) {
+            Delete(user);
+            SaveChanges();
+        }
+
         public User FindById(long id) {
             return FindByCondition(x => x.Id == id).FirstOrDefault();
         }
@@ -22,5 +33,7 @@ namespace EnviosApp.Repository.Implementation {
             Create(user);
             SaveChanges();
         }
+
+
     }
 }

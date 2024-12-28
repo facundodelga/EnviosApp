@@ -6,5 +6,7 @@ namespace EnviosApp.Repository {
         void Save(User user);
         User FindById(long id);
         User FindByUserName(string username);
+        void RemoveUser(User user);
+        void UpdateUser(User user);
     }
 }

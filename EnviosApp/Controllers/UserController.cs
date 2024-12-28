@@ -24,8 +24,8 @@ namespace EnviosApp.Controllers
             try {
                 var user = _userRepository.FindById(id);
 
-                if (user == null) { 
-                    return Forbid();
+                if (user == null) {
+                    return StatusCode(500, "User not found");
                 }
 
                 return Ok(user);
@@ -42,7 +42,7 @@ namespace EnviosApp.Controllers
                 var user = _userRepository.GetAllUsers();
 
                 if (user == null) {
-                    return Forbid();
+                    return StatusCode(500, "User not found");
                 }
 
                 return Ok(UserDTO.UserToUserDTO(user.ToList()));
@@ -54,7 +54,7 @@ namespace EnviosApp.Controllers
 
         [HttpPost]
         [Authorize(Policy = "adminOnly")]
-        public IActionResult Post([FromBody] UserDTO userDTO) {
+        public IActionResult Post([FromBody] NewUserDTO userDTO) {
             try {
                 var user = _userRepository.FindByUserName(userDTO.Username);
 
@@ -65,8 +65,8 @@ namespace EnviosApp.Controllers
                 User newUser = new User { 
                     Name =  userDTO.Name ,
                     UserName = userDTO.Username,
-                    Password = userDTO.Password
-                
+                    Password = userDTO.Password,
+                    Role = userDTO.Role
                 };
 
                 _userRepository.Save(newUser);
@@ -77,5 +77,58 @@ namespace EnviosApp.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "adminOnly")]
+        public IActionResult Delete(int id) {
+            try {
+                var user = _userRepository.FindById(id);
+
+                if (user == null) {
+                    return StatusCode(500, "User not Found");
+                }
+
+                _userRepository.RemoveUser(user);
+
+                return Ok(new UserDTO(user));
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Policy = "adminOnly")]
+        public IActionResult Update(long id, [FromBody] NewUserDTO userDto) {
+            try {
+                // Validar el DTO recibido
+                if (userDto == null) {
+                    return BadRequest("Datos del usuario son requeridos.");
+                }
+
+                // Buscar el usuario existente en la base de datos
+                var user = _userRepository.FindById(id);
+                if (user == null) {
+                    return  StatusCode(500, "User not found");
+                }
+
+                // Actualizar las propiedades del usuario
+                user.Name = userDto.Name;
+                user.UserName = userDto.Username;
+                user.Password = userDto.Password;
+                user.Role = userDto.Role;
+
+                // Guardar los cambios
+                _userRepository.UpdateUser(user);
+
+                return Ok(new UserDTO(user)); // Devuelve el usuario actualizado
+            }
+            catch (Exception ex) {
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
+
     }
 }
