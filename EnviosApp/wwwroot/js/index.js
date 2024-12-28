@@ -25,8 +25,8 @@ async function submitForm() {
             const result = await response.json();
             console.log('Inicio de sesión exitoso:', result);
             localStorage.setItem('jwt', result.token)
-            const code = () => alert(result.message);
-            code();
+            
+            window.location.href = '/admin.html'
             
         } else {
             const error = await response.json();

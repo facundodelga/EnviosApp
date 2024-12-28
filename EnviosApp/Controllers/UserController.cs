@@ -1,8 +1,11 @@
 ﻿using EnviosApp.Models;
 using EnviosApp.Models.DTOs;
 using EnviosApp.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EnviosApp.Controllers
 {
@@ -15,8 +18,9 @@ namespace EnviosApp.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpGet]
-        public IActionResult Get(long id) {
+        [HttpGet("{id}")]
+        [Authorize(Policy = "adminOnly")]
+        public IActionResult GetById(long id) {
             try {
                 var user = _userRepository.FindById(id);
 
@@ -31,13 +35,31 @@ namespace EnviosApp.Controllers
             }
         }
 
+        [HttpGet("all")]
+        [Authorize(Policy = "adminOnly")]
+        public IActionResult GetAll() {
+            try {
+                var user = _userRepository.GetAllUsers();
+
+                if (user == null) {
+                    return Forbid();
+                }
+
+                return Ok(UserDTO.UserToUserDTO(user.ToList()));
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost]
+        [Authorize(Policy = "adminOnly")]
         public IActionResult Post([FromBody] UserDTO userDTO) {
             try {
                 var user = _userRepository.FindByUserName(userDTO.Username);
 
                 if (user != null) {
-                    return Forbid();
+                    return Forbid("Username already exists!");
                 }
 
                 User newUser = new User { 

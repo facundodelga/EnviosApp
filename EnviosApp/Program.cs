@@ -4,6 +4,7 @@ using EnviosApp.Repository.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Log para debugear
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 builder.Services.AddDbContext<EnviosDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("HomeBankingConexion")));
 
@@ -35,12 +40,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ClockSkew = TimeSpan.Zero //asegurar que no haya tolerancia para diferencias de tiempo entre el emisor y el validador del token
     };
 
+    opt.Events = new JwtBearerEvents {
+        OnTokenValidated = context =>
+        {
+            var claims = context.Principal.Claims;
+            Console.WriteLine("Claims después de validación:");
+            foreach (var claim in claims) {
+                Console.WriteLine($"Claim validado - Type: {claim.Type}, Value: {claim.Value}");
+            }
+            return Task.CompletedTask;
+        }
+    };
+
 });
 
 //Agrego servicios de autorizacion
 builder.Services.AddAuthorization(options => {
     options.AddPolicy("userOnly", policy => policy.RequireClaim("user"));
-    options.AddPolicy("AdminOnly", policy => policy.RequireClaim("admin"));
+    options.AddPolicy("adminOnly", policy => policy.RequireClaim(ClaimsIdentity.DefaultRoleClaimType, "admin"));
 });
 
 var app = builder.Build();
@@ -71,13 +88,14 @@ else {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseDefaultFiles(); // Esto buscará archivos como index.html de forma predeterminada
 app.UseStaticFiles();
 app.MapControllers();
 
 app.UseRouting();
-
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.MapRazorPages();
 
