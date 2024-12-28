@@ -39,7 +39,8 @@ namespace EnviosApp.Controllers
             if(user.Role.Equals("admin")) {
                 claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin"));
             }
-            claims.Add(new Claim("user", loginDTO.Username));
+            claims.Add(new Claim("username", loginDTO.Username));
+            claims.Add(new Claim("name", user.Name));
 
             // Antes de crear el token
             foreach (var claim in claims) {
@@ -52,6 +53,7 @@ namespace EnviosApp.Controllers
             var claimsIdentity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
 
             var tokenDescriptor = new SecurityTokenDescriptor() {
+
                 Subject = claimsIdentity,
                 Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(byteKey), SecurityAlgorithms.HmacSha256Signature),

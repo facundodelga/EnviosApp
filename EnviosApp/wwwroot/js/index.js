@@ -26,7 +26,7 @@ async function submitForm() {
             console.log('Inicio de sesión exitoso:', result);
             localStorage.setItem('jwt', result.token)
             
-            window.location.href = '/admin.html'
+            window.location.href = '/home.html'
             
         } else {
             const error = await response.json();
