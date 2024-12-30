@@ -9,6 +9,11 @@ namespace EnviosApp.Repository.Implementation {
             return FindByCondition(cl => cl.Id == id).FirstOrDefault();
         }
 
+        public Client FindByEmail(string email) {
+            return FindByCondition(cl => cl.Email.Equals(email)).FirstOrDefault();
+        }
+
+
         public IEnumerable<Client> FindByOrganization(string organization) {
             return FindByCondition(cl => cl.Organization.Equals(organization)).ToList();
         }
@@ -27,7 +32,7 @@ namespace EnviosApp.Repository.Implementation {
             SaveChanges();
         }
 
-        public void UpdateUser(Client client) {
+        public void UpdateClient(Client client) {
             Update(client);
             SaveChanges();
         }

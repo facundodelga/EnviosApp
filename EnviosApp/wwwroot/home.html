@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>EnviosApp - Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
@@ -11,7 +11,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Dashboard</a>
+            <a class="navbar-brand" href="#">EnviosApp</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -22,6 +22,9 @@
                     </li>
                     <li class="nav-item" id="adminLink" style="display: none;">
                         <a class="nav-link" href="admin.html">Administración</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="clients.html">Clientes</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
@@ -40,30 +43,19 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h2 class="card-title" id="welcomeMessage">¡Bienvenido!</h2>
-                        <p class="card-text">Este es tu panel de control personal.</p>
+                        <p class="card-text">Este es tu panel de control.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Widgets -->
+            <!-- Widgets actualizados -->
             <div class="col-md-4">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <i class="bi bi-person-circle fs-1 text-primary mb-3"></i>
-                        <h5 class="card-title">Tu Perfil</h5>
-                        <p class="card-text">Gestiona tu información personal</p>
-                        <button class="btn btn-primary" onclick="showProfile()">Ver Perfil</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-gear-fill fs-1 text-success mb-3"></i>
-                        <h5 class="card-title">Configuración</h5>
-                        <p class="card-text">Personaliza tus preferencias</p>
-                        <button class="btn btn-success" onclick="showSettings()">Configurar</button>
+                        <i class="bi bi-people-fill fs-1 text-primary mb-3"></i>
+                        <h5 class="card-title">Gestión de Clientes</h5>
+                        <p class="card-text">Administra la información de tus clientes</p>
+                        <a href="clients.html" class="btn btn-primary">Ir a Clientes</a>
                     </div>
                 </div>
             </div>
@@ -71,15 +63,27 @@
             <div class="col-md-4">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <i class="bi bi-bell-fill fs-1 text-warning mb-3"></i>
-                        <h5 class="card-title">Notificaciones</h5>
-                        <p class="card-text">Centro de notificaciones</p>
-                        <button class="btn btn-warning" onclick="showNotifications()">Ver Notificaciones</button>
+                        <i class="bi bi-plus-circle-fill fs-1 text-success mb-3"></i>
+                        <h5 class="card-title">Nueva Guía Aérea</h5>
+                        <p class="card-text">Crea una nueva guía de envío</p>
+                        <button class="btn btn-success" onclick="showComingSoon('nueva guía aérea')">Crear Guía</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-search fs-1 text-warning mb-3"></i>
+                        <h5 class="card-title">Buscar Guías</h5>
+                        <p class="card-text">Busca y consulta guías existentes</p>
+                        <button class="btn btn-warning" onclick="showComingSoon('buscador de guías')">Buscar</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- Footer -->
     <footer class="bg-dark text-white text-center py-3 mt-5">

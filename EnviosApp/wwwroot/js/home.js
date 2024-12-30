@@ -24,11 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (decodedToken) {
         // Mostrar información del usuario
         const userInfo = document.getElementById('userInfo');
-        userInfo.textContent = `Bienvenido, ${decodedToken.name}`;
+        userInfo.textContent = `Bienvenido, ${decodedToken.username}`;
 
         // Actualizar mensaje de bienvenida
         const welcomeMessage = document.getElementById('welcomeMessage');
-        welcomeMessage.textContent = `¡Bienvenido, ${decodedToken.name}!`;
+        welcomeMessage.textContent = `¡Bienvenido, ${decodedToken.username}!`;
 
         // Mostrar/ocultar enlace de administración según el rol
         const adminLink = document.getElementById('adminLink');
@@ -44,15 +44,7 @@ function logout() {
     window.location.href = '/index.html';
 }
 
-// Funciones para los botones de widgets
-function showProfile() {
-    alert('Función de perfil en desarrollo');
-}
-
-function showSettings() {
-    alert('Función de configuración en desarrollo');
-}
-
-function showNotifications() {
-    alert('Función de notificaciones en desarrollo');
+// Función para mostrar mensaje de "Próximamente"
+function showComingSoon(feature) {
+    alert(`La funcionalidad de ${feature} estará disponible próximamente.`);
 }

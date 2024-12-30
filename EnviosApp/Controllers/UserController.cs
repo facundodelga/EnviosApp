@@ -62,8 +62,33 @@ namespace EnviosApp.Controllers
                     return Forbid("Username already exists!");
                 }
 
-                Client newUser = new Client { 
+                User newUser = new User { 
                     Name =  userDTO.Name ,
+                    UserName = userDTO.Username,
+                    Password = userDTO.Password,
+                    Role = userDTO.Role
+                };
+
+                _userRepository.Save(newUser);
+
+                return Ok(userDTO);
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("initial")]
+        public IActionResult PostInitial([FromBody] NewUserDTO userDTO) {
+            try {
+                var user = _userRepository.GetAllUsers();
+
+                if (user.Any()) {
+                    return Forbid("Cannot use this endpoint");
+                }
+
+                User newUser = new User {
+                    Name = userDTO.Name,
                     UserName = userDTO.Username,
                     Password = userDTO.Password,
                     Role = userDTO.Role

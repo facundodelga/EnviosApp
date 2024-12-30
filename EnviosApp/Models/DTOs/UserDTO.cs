@@ -5,17 +5,17 @@
         public string Username { get; set; }
         public string Role { get; set; }
 
-        public UserDTO(Client user) {
+        public UserDTO(User user) {
             Id = user.Id;
             Name = user.Name;
             Username = user.UserName;
             Role = user.Role;
         }
 
-        public static List<UserDTO> UserToUserDTO(List<Client> users) {
+        public static List<UserDTO> UserToUserDTO(List<User> users) {
             List<UserDTO> userDTOs = new List<UserDTO>();
 
-            foreach (Client user in users) {
+            foreach (User user in users) {
                 userDTOs.Add(new UserDTO(user));
             }
 

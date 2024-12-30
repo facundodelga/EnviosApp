@@ -57,7 +57,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 //Agrego servicios de autorizacion
 builder.Services.AddAuthorization(options => {
-    options.AddPolicy("userOnly", policy => policy.RequireClaim("user"));
+    options.AddPolicy("userOnly", policy => policy.RequireClaim(ClaimsIdentity.DefaultRoleClaimType, "user", "admin"));
     options.AddPolicy("adminOnly", policy => policy.RequireClaim(ClaimsIdentity.DefaultRoleClaimType, "admin"));
 });
 

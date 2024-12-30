@@ -39,9 +39,12 @@ namespace EnviosApp.Controllers
             if(user.Role.Equals("admin")) {
                 claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin"));
             }
+            else {
+                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, "user"));
+            }
             claims.Add(new Claim("username", loginDTO.Username));
             claims.Add(new Claim("name", user.Name));
-
+            
             // Antes de crear el token
             foreach (var claim in claims) {
                 Console.WriteLine($"Claim a incluir en token - Type: {claim.Type}, Value: {claim.Value}");
