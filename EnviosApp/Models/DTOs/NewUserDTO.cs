@@ -7,7 +7,7 @@
         public string Password { get; set; }
         public string Role { get; set; }
 
-        public NewUserDTO(User user) {
+        public NewUserDTO(Client user) {
             Name = user.Name;
             Username = user.UserName;
             Password = user.Password;
@@ -17,10 +17,10 @@
         public NewUserDTO() {
         }
 
-        public static List<NewUserDTO> UserToNewUserDTO(List<User> users) {
+        public static List<NewUserDTO> UserToNewUserDTO(List<Client> users) {
             List<NewUserDTO> userDTOs = new List<NewUserDTO>();
 
-            foreach (User user in users) { 
+            foreach (Client user in users) { 
                 userDTOs.Add(new NewUserDTO(user));
             }
 

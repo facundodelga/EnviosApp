@@ -1,7 +1,7 @@
 ﻿using EnviosApp.Models;
 
 namespace EnviosApp.Repository {
-    public interface IUserRepository {
+    public interface IClientRepository {
         IEnumerable<Client> GetAllUsers();
         void Save(Client user);
         Client FindById(long id);

@@ -62,7 +62,7 @@ namespace EnviosApp.Controllers
                     return Forbid("Username already exists!");
                 }
 
-                User newUser = new User { 
+                Client newUser = new Client { 
                     Name =  userDTO.Name ,
                     UserName = userDTO.Username,
                     Password = userDTO.Password,
