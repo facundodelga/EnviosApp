@@ -9,20 +9,27 @@ namespace EnviosApp.Repository.Implementation {
             return FindByCondition(cl => cl.Id == id).FirstOrDefault();
         }
 
+        public IEnumerable<Client> FindByOrganization(string organization) {
+            return FindByCondition(cl => cl.Organization.Equals(organization)).ToList();
+        }
+
         public IEnumerable<Client> GetAllClients() {
             return FindAll().ToList();
         }
 
         public void RemoveUser(Client client) {
-            throw new NotImplementedException();
+            Delete(client);
+            SaveChanges();
         }
 
         public void Save(Client client) {
-            throw new NotImplementedException();
+            Create(client);
+            SaveChanges();
         }
 
         public void UpdateUser(Client client) {
-            throw new NotImplementedException();
+            Update(client);
+            SaveChanges();
         }
     }
 }

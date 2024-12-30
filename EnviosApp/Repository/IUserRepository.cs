@@ -1,12 +1,13 @@
 ﻿using EnviosApp.Models;
 
-namespace EnviosApp.Repository {
+namespace EnviosApp.Repository
+{
     public interface IUserRepository {
-        IEnumerable<Client> GetAllUsers();
-        void Save(Client user);
-        Client FindById(long id);
-        Client FindByUserName(string username);
-        void RemoveUser(Client user);
-        void UpdateUser(Client user);
+        IEnumerable<User> GetAllUsers();
+        void Save(User user);
+        User FindById(long id);
+        User FindByUserName(string username);
+        void RemoveUser(User user);
+        void UpdateUser(User user);
     }
 }

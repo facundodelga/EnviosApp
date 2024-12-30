@@ -1,4 +1,5 @@
 ﻿namespace EnviosApp.Models {
-    public class Guia {
+    public class Waybill {
+
     }
 }

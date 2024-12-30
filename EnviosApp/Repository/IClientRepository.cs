@@ -2,11 +2,11 @@
 
 namespace EnviosApp.Repository {
     public interface IClientRepository {
-        IEnumerable<Client> GetAllUsers();
-        void Save(Client user);
+        IEnumerable<Client> GetAllClients();
+        void Save(Client client);
         Client FindById(long id);
-        Client FindByUserName(string username);
-        void RemoveUser(Client user);
-        void UpdateUser(Client user);
+        IEnumerable<Client> FindByOrganization(string organization);
+        void RemoveUser(Client client);
+        void UpdateUser(Client client);
     }
 }

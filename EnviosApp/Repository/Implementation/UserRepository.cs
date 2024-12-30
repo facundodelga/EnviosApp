@@ -1,35 +1,35 @@
 ﻿using EnviosApp.Models;
 
 namespace EnviosApp.Repository.Implementation {
-    public class UserRepository : RepositoryBase<Client>, IUserRepository {
+    public class UserRepository : RepositoryBase<User>, IUserRepository {
         public UserRepository(EnviosDBContext enviosDBContext) : base(enviosDBContext) {
             
         }
 
-        public void UpdateUser(Client user) {
+        public void UpdateUser(User user) {
             Update(user);
             SaveChanges();
         
         }
 
-        public void RemoveUser(Client user) {
+        public void RemoveUser(User user) {
             Delete(user);
             SaveChanges();
         }
 
-        public Client FindById(long id) {
+        public User FindById(long id) {
             return FindByCondition(x => x.Id == id).FirstOrDefault();
         }
 
-        public Client FindByUserName(string username) {
+        public User FindByUserName(string username) {
             return FindByCondition(x => x.UserName == username).FirstOrDefault();
         }
 
-        public IEnumerable<Client> GetAllUsers() {
+        public IEnumerable<User> GetAllUsers() {
             return FindAll().ToList();
         }
 
-        public void Save(Client user) {
+        public void Save(User user) {
             Create(user);
             SaveChanges();
         }
