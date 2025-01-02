@@ -6,7 +6,7 @@ namespace EnviosApp.Repository {
         void Save(Client client);
         Client FindById(long id);
         IEnumerable<Client> FindByOrganization(string organization);
-        void RemoveUser(Client client);
+        void RemoveClient(Client client);
         void UpdateClient(Client client);
         Client FindByEmail(string email);
     }

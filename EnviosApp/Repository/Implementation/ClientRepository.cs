@@ -22,7 +22,7 @@ namespace EnviosApp.Repository.Implementation {
             return FindAll().ToList();
         }
 
-        public void RemoveUser(Client client) {
+        public void RemoveClient(Client client) {
             Delete(client);
             SaveChanges();
         }

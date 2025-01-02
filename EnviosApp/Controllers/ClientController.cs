@@ -85,25 +85,25 @@ namespace EnviosApp.Controllers
             }
         }
 
-        //[HttpDelete("{id}")]
-        //[Authorize(Policy = "adminOnly")]
-        //public IActionResult Delete(int id) {
-        //    try {
-        //        var Client = _ClientRepository.FindById(id);
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "adminOnly")]
+        public IActionResult Delete(int id) {
+            try {
+                var client = _ClientRepository.FindById(id);
 
-        //        if (Client == null) {
-        //            return StatusCode(500, "Client not Found");
-        //        }
+                if (client == null) {
+                    return StatusCode(500, "Client not Found");
+                }
 
-        //        _ClientRepository.RemoveClient(Client);
+                _ClientRepository.RemoveClient(client);
 
-        //        return Ok(new ClientDTO(Client));
-        //    }
-        //    catch (Exception ex) {
-        //        return BadRequest(ex.Message);
-        //    }
+                return Ok(new ClientDTO(client));
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
 
-        //}
+        }
 
         [HttpPut("{id}")]
         [Authorize(Policy = "adminOnly")]
