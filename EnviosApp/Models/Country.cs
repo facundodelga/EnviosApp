@@ -1,5 +1,7 @@
-﻿namespace EnviosApp.Models {
-    public class Country {
+﻿namespace EnviosApp.Models
+{
+    public class Country
+    {
         public int Id { get; set; }
         public string Alpha { get; set; }
         public string Name { get; set; }

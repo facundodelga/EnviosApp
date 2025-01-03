@@ -1,6 +1,8 @@
-﻿namespace EnviosApp.Models {
+﻿namespace EnviosApp.Models
+{
 
-    public class ZoneCountry {
+    public class ZoneCountry
+    {
         public int ZoneId { get; set; } // FK a Zone
         public int CountryId { get; set; } // FK a Country
 

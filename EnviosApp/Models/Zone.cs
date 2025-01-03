@@ -1,5 +1,7 @@
-﻿namespace EnviosApp.Models {
-    public class Zone {
+﻿namespace EnviosApp.Models
+{
+    public class Zone
+    {
         public int Id { get; set; }
         public int ProviderId { get; set; } // FK a Provider
         public string Name { get; set; } // Ejemplo: Zona 1, Zona A

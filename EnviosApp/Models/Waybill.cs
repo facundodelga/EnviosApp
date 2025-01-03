@@ -1,5 +1,7 @@
-﻿namespace EnviosApp.Models {
-    public class Waybill {
+﻿namespace EnviosApp.Models
+{
+    public class Waybill
+    {
         public long Id { get; set; }
         public string WaybillNumber { get; set; }
         public string Address { get; set; }
@@ -22,7 +24,7 @@
         public Provider Provider { get; set; }
         public Country Country { get; set; }
         public Client Client { get; set; }
-        
+
 
         public Waybill() { }
 
