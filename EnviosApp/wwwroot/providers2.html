@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Proveedor</title>
+    <style>
+        body { font-family: sans-serif; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], select { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
+        button { padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        #serviceTypes, #zones { margin-bottom: 20px; }
+        .service-type, .zone { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .remove-btn { background-color: #f44336; } 
+    </style>
+</head>
+<body>
+
+    <h1>Crear Proveedor</h1>
+
+    <label for="providerName">Nombre del Proveedor:</label>
+    <input type="text" id="providerName" name="providerName">
+
+    <div id="serviceTypes">
+        <h2>Tipos de Servicio</h2>
+        <button onclick="addServiceType()">Agregar Tipo de Servicio</button>
+    </div>
+
+    <div id="zones">
+        <h2>Zonas</h2>
+        <button onclick="addZone()">Agregar Zona</button>
+    </div>
+
+    <button onclick="createProvider()">Crear Proveedor</button>
+
+    <script>
+        let serviceTypes = [];
+        let zones = [];
+
+        function addServiceType() {
+            const serviceTypeDiv = document.createElement('div');
+            serviceTypeDiv.className = 'service-type';
+            serviceTypeDiv.innerHTML = `
+                <label for="serviceName">Nombre del Servicio:</label>
+                <input type="text" class="serviceName">
+                <label for="serviceMultiplier">Multiplicador de Precio:</label>
+                <input type="number" class="serviceMultiplier" min="0" step="0.01">
+                <button class="remove-btn" onclick="this.parentNode.remove()">Eliminar</button>
+            `;
+            document.getElementById('serviceTypes').appendChild(serviceTypeDiv);
+        }
+
+        function addZone() {
+            const zoneDiv = document.createElement('div');
+            zoneDiv.className = 'zone';
+            zoneDiv.innerHTML = `
+                <label for="zoneName">Nombre de la Zona:</label>
+                <input type="text" class="zoneName">
+                <label for="basePrice">Precio Base:</label>
+                <input type="number" class="basePrice" min="0" step="0.01">
+                <label for="countries">Países (separados por coma):</label>
+                <input type="text" class="countries">
+                <button class="remove-btn" onclick="this.parentNode.remove()">Eliminar</button>
+            `;
+            document.getElementById('zones').appendChild(zoneDiv);
+        }
+
+
+        function createProvider() {
+            const providerName = document.getElementById('providerName').value;
+
+
+            const serviceTypeElements = document.querySelectorAll('.service-type');
+            serviceTypes = Array.from(serviceTypeElements).map(element => ({
+                name: element.querySelector('.serviceName').value,
+                multiplier: parseFloat(element.querySelector('.serviceMultiplier').value)
+            }));
+
+            const zoneElements = document.querySelectorAll('.zone');
+            zones = Array.from(zoneElements).map(element => ({
+                name: element.querySelector('.zoneName').value,
+                basePrice: parseFloat(element.querySelector('.basePrice').value),
+                countries: element.querySelector('.countries').value.split(',').map(s => s.trim())
+            }));
+
+            const providerData = {
+                name: providerName,
+                serviceTypes: serviceTypes,
+                zones: zones
+            };
+
+             // Verificar el token JWT
+            const token = localStorage.getItem('token'); // O de donde sea que lo obtengas
+            if (!token) {
+                alert('No estás autorizado. Debes iniciar sesión.');
+                return; // Detener la ejecución
+            }
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+             if (!decodedToken.roles || !decodedToken.roles.includes('admin')) {
+                 alert("No tienes permisos para realizar esta accion")
+                 return;
+             }
+
+            // Aquí iría la lógica para enviar los datos al servidor (fetch, XMLHttpRequest, etc.)
+            console.log(JSON.stringify(providerData, null, 2)); // Mostrar los datos en la consola por ahora
+          
+            fetch('/api/providers', { // Reemplaza /api/providers con la ruta correcta de tu API
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Asegúrate de incluir el token en la cabecera Authorization
+                },
+                body: JSON.stringify(providerData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                   throw new Error(`Error HTTP ${response.status}`);
+                }
+                 return response.json(); // o response.text() si la respuesta no es JSON
+             })
+             .then(data => {
+                 console.log('Proveedor creado:', data);
+                 // Aquí puedes redirigir al usuario, mostrar un mensaje de éxito, etc.
+                alert('Proveedor creado exitosamente');
+
+             })
+             .catch(error => {
+               console.error('Error al crear el proveedor:', error);
+               alert('Error al crear el proveedor. Por favor, inténtalo de nuevo.');
+
+
+             });
+
+
+
+        }
+    </script>
+
+</body>
+</html>
