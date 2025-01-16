@@ -28,44 +28,53 @@ namespace EnviosApp.Controllers
             if (loginDTO.Username.IsNullOrEmpty() || loginDTO.Password.IsNullOrEmpty()) {
                 return BadRequest("null parameters");
             }
+            try {
+                var user = _userRepository.FindByUserName(loginDTO.Username);
+                if (user == null || user.Password != loginDTO.Password)
+                    return BadRequest("User notFound");
+
+
+                var claims = new List<Claim>();
+
+                //Me fijo si soy admin
+                if (user.Role.Equals("admin")) {
+                    claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin"));
+                }
+                else {
+                    claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, "user"));
+                }
+                claims.Add(new Claim("username", loginDTO.Username));
+                claims.Add(new Claim("name", user.Name));
+
+                // Antes de crear el token
+                foreach (var claim in claims) {
+                    Console.WriteLine($"Claim a incluir en token - Type: {claim.Type}, Value: {claim.Value}");
+                }
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var byteKey = Encoding.UTF8.GetBytes(jwtKey);
+
+                var claimsIdentity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
+
+                var tokenDescriptor = new SecurityTokenDescriptor() {
+
+                    Subject = claimsIdentity,
+                    Expires = DateTime.UtcNow.AddMinutes(10),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(byteKey), SecurityAlgorithms.HmacSha256Signature),
+                };
+
+                var tokenConfig = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenjwt = tokenHandler.WriteToken(tokenConfig);
+                //devuelvo el token para almacenarlo en el navegador
+                return Ok(new { message = "Inicio de sesión exitoso", token = tokenjwt });
+            }
+            catch (Exception ex) {
             
-            var user = _userRepository.FindByUserName(loginDTO.Username);
-            if (user == null || user.Password != loginDTO.Password)
-                return BadRequest("User notFound");
-
-            var claims = new List<Claim>();
-
-            //Me fijo si soy admin
-            if(user.Role.Equals("admin")) {
-                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin"));
-            }
-            else {
-                claims.Add(new Claim(ClaimsIdentity.DefaultRoleClaimType, "user"));
-            }
-            claims.Add(new Claim("username", loginDTO.Username));
-            claims.Add(new Claim("name", user.Name));
+                Console.WriteLine($"Exception : ");
+                return BadRequest();
             
-            // Antes de crear el token
-            foreach (var claim in claims) {
-                Console.WriteLine($"Claim a incluir en token - Type: {claim.Type}, Value: {claim.Value}");
             }
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var byteKey = Encoding.UTF8.GetBytes(jwtKey);
-
-            var claimsIdentity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
-
-            var tokenDescriptor = new SecurityTokenDescriptor() {
-
-                Subject = claimsIdentity,
-                Expires = DateTime.UtcNow.AddMinutes(10),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(byteKey), SecurityAlgorithms.HmacSha256Signature),
-            };
-
-            var tokenConfig = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenjwt = tokenHandler.WriteToken(tokenConfig);
-            //devuelvo el token para almacenarlo en el navegador
-            return Ok(new { message = "Inicio de sesión exitoso", token = tokenjwt });
+            
         }
 
         [HttpPost("logout")]

@@ -21,9 +21,7 @@ namespace EnviosApp.Repository.Implementation {
             return FindByCondition(x => x.Id == id).FirstOrDefault();
         }
 
-        public User FindByUserName(string username) {
-            return FindByCondition(x => x.UserName == username).FirstOrDefault();
-        }
+        public User FindByUserName(string username) => FindByCondition(x => x.UserName == username).FirstOrDefault();
 
         public IEnumerable<User> GetAllUsers() {
             return FindAll().ToList();

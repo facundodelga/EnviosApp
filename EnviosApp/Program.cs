@@ -71,7 +71,7 @@ using (var scope = app.Services.CreateScope()) {
 
         // En este paso buscamos un service que este con la clase HomeBankingContext
         var context = services.GetRequiredService<EnviosDBContext>();
-        //DBInitializer.Initialize(context);
+        EnviosDBContext.Initialize(context);
     }
     catch (Exception ex) {
         var logger = services.GetRequiredService<ILogger<Program>>();

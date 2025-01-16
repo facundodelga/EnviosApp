@@ -19,9 +19,9 @@
         public decimal Depth { get; set; } = 0.1m;
         public decimal Price { get; set; }
         public long ClientId { get; set; } // FK a Client
-        public int ServiceTypeId { get; set; } // FK a ServiceType
-        public int ProviderId { get; set; } // FK a Provider
-        public int CountryId { get; set; } // FK a Country
+        public long ServiceTypeId { get; set; } // FK a ServiceType
+        public long ProviderId { get; set; } // FK a Provider
+        public long CountryId { get; set; } // FK a Country
 
         public ServiceType ServiceType { get; set; }
         public Provider Provider { get; set; }
