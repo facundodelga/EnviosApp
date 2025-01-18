@@ -6,7 +6,7 @@ namespace EnviosApp.Repository.Implementation {
         public ProviderRepository(EnviosDBContext context) : base(context) { }
 
         public Provider GetProvider(string name) {
-            return FindByCondition(p => p.Name.Equals(name))
+            return FindByCondition(p => p.Name.ToLower().Equals(name))
                 .Include(p => p.ServiceTypes)
                 .Include(p => p.Zones)
                 .FirstOrDefault();
@@ -20,7 +20,15 @@ namespace EnviosApp.Repository.Implementation {
         }
 
         public IEnumerable<Provider> GetProvidersWithZones() {
-            return FindAll().ToList();
+            return FindAll()
+                .Include(p => p.ServiceTypes)
+                .Include(p => p.Zones)
+                .ToList();
+        }
+
+        public void Save(Provider provider) {
+            Create(provider);
+            SaveChanges();
         }
     }
 }

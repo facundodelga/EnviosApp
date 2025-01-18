@@ -10,5 +10,9 @@ namespace EnviosApp.Repository.Implementation
             return FindByCondition(z => z.ProviderId == providerId).AsEnumerable();
         }
 
+        public void Save(Zone newZone) {
+            Create(newZone);
+            SaveChanges();  
+        }
     }
 }

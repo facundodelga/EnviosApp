@@ -5,5 +5,7 @@ namespace EnviosApp.Repository.Implementation {
         IEnumerable<Provider> GetProvidersWithZones();
         Provider GetProvider(string name);
         Provider GetProviderById(long id);
+
+        void Save(Provider provider);
     }
 }

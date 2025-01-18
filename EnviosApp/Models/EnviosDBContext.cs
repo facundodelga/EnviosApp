@@ -5,6 +5,14 @@ namespace EnviosApp.Models {
         public EnviosDBContext(DbContextOptions<EnviosDBContext> dbContextOptions) : base(dbContextOptions) {        }
 
         public static void Initialize(EnviosDBContext context) {
+            if (!context.User.Any()) {
+                var users = new User[] {
+                    new User { Name = "Facundo Delgado", Password = "123", Role= "admin", UserName= "Facundo" },
+                    new User { Name = "Roberto Perez", Password = "robert", Role= "user", UserName= "robert" }
+                };
+                context.User.AddRange(users);
+                context.SaveChanges();
+            }
             if (!context.Country.Any()) {
                 var countries = new Country[] {
 
@@ -203,6 +211,39 @@ namespace EnviosApp.Models {
                 //guardamos
                 context.SaveChanges();
             }
+            if (!context.Provider.Any()) {
+                var providers = new Provider[] {
+                    new Provider { Name = "DHL" }
+
+                };
+                context.Provider.AddRange(providers);
+                context.SaveChanges();
+            }
+            if (!context.ServiceType.Any()) {
+                var servicetypes = new ServiceType[] {
+                    new ServiceType { Name = "DHL Economy", ProviderId = 1, PriceMultiplier = 0.5m }
+
+                };
+                context.ServiceType.AddRange(servicetypes);
+                context.SaveChanges();
+            }
+            if (!context.Zone.Any()) {
+                var zones= new Zone[] {
+                    new Zone { Name = "Zona 1", ProviderId = 1, BasePrice = 2.0m }
+
+                };
+                context.Zone.AddRange(zones);
+                context.SaveChanges();
+            }
+            if (!context.ZoneCountry.Any()) {
+                var zones = new ZoneCountry[] {
+                    new ZoneCountry { CountryId = 1, ZoneId = 1 }
+
+                };
+                context.ZoneCountry.AddRange(zones);
+                context.SaveChanges();
+            }
+
 
         }
 

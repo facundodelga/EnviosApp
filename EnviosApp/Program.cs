@@ -25,6 +25,9 @@ builder.Services.AddDbContext<EnviosDBContext>(options => options.UseSqlServer(b
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
+builder.Services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
+builder.Services.AddScoped<IZoneRepository, ZoneRepository>();
+builder.Services.AddScoped<IZoneCountryRepository, ZoneCountryRepository>();
 
 //Servicios de autenticacion
 var jwtSecretKey = builder.Configuration.GetConnectionString("Jwt-Key");

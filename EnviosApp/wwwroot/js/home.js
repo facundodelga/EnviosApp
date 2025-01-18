@@ -32,8 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Mostrar/ocultar enlace de administración según el rol
         const adminLink = document.getElementById('adminLink');
+        const providersLink = document.getElementById('providersLink');
         if (decodedToken.role === 'admin') {
             adminLink.style.display = 'block';
+            providersLink.style.display = 'block';
         }
     }
 });

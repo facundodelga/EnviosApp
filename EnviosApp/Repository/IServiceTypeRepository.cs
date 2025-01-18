@@ -1,6 +1,8 @@
-﻿namespace EnviosApp.Repository
+﻿using EnviosApp.Models;
+
+namespace EnviosApp.Repository
 {
-    internal interface IServiceTypeRepository
-    {
+    public interface IServiceTypeRepository {
+        void Save(ServiceType newservice);
     }
 }
