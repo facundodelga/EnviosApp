@@ -320,7 +320,7 @@ async function editProvider(providerId) {
             const zoneInputs = zoneEntry.querySelectorAll('.card-body > .row input');
             zoneInputs[0].value = zone.name;
             zoneInputs[1].value = zone.basePrice;
-            /*
+            
             // Limpiar países por defecto
             zoneEntry.querySelector('.countries-container').innerHTML = '';
 
@@ -330,7 +330,7 @@ async function editProvider(providerId) {
                 const lastCountryInput = zoneEntry.querySelector('.countries-container .row:last-child input');
                 lastCountryInput.value = country;
             });
-            */
+            
         });
 
         const modal = new bootstrap.Modal(document.getElementById('providerModal'));

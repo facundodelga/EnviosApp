@@ -7,6 +7,10 @@ namespace EnviosApp.Repository.Implementation
     {
         public CountryRepository(EnviosDBContext context) : base(context) { }
 
+        public Country GetCountryByName(string name) {
+            return FindByCondition(c => c.Name == name).FirstOrDefault();    
+        }
+
         //public IEnumerable<Country> GetCountriesByZone(int zoneId)
         //{
         //    return FindByCondition(country => country.ZoneCountries.Any(zc => zc.ZoneId == zoneId)).ToList();

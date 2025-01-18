@@ -1,6 +1,7 @@
 using EnviosApp.Models;
 using EnviosApp.Repository;
 using EnviosApp.Repository.Implementation;
+using EnviosApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,13 +22,17 @@ builder.Logging.AddDebug();
 
 builder.Services.AddDbContext<EnviosDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("HomeBankingConexion")));
 
-//inyeccion de independencias
+//inyeccion de independencias repositorios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
 builder.Services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
 builder.Services.AddScoped<IZoneRepository, ZoneRepository>();
 builder.Services.AddScoped<IZoneCountryRepository, ZoneCountryRepository>();
+builder.Services.AddScoped<ICountryRepository, CountryRepository>();
+
+//inyeccion de independencias servicios
+builder.Services.AddScoped<IProviderService, ProviderService>();
 
 //Servicios de autenticacion
 var jwtSecretKey = builder.Configuration.GetConnectionString("Jwt-Key");

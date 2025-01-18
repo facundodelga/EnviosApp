@@ -2,6 +2,7 @@
 using EnviosApp.Models.DTOs;
 using EnviosApp.Repository;
 using EnviosApp.Repository.Implementation;
+using EnviosApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,91 +12,42 @@ namespace EnviosApp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class ProviderController : ControllerBase {
-        private IProviderRepository _providerRepository;
-        private IServiceTypeRepository _serviceTypeRepository;
-        private IZoneRepository _zoneRepository;
+        private IProviderService _providerService;
+        
 
-        public ProviderController(
-            IProviderRepository providerRepository, 
-            IZoneRepository zoneRepository, 
-            IServiceTypeRepository serviceTypeRepository) {
-            _providerRepository = providerRepository;
-            _serviceTypeRepository = serviceTypeRepository;
-            _zoneRepository = zoneRepository;
+        public ProviderController(IProviderService providerService) {
+            _providerService = providerService;
+            
         }
 
         [HttpGet]
         [Authorize(Policy = "adminOnly")]
         public IActionResult GetAllProviders() {
-            var providers = _providerRepository.GetProvidersWithZones();
-
-            if (providers == null) {
-                return NotFound();
-            }
-            
-            List<ProviderDTO> providerDTOs = new List<ProviderDTO>();
-            
-            foreach (var provider in providers) {
-                providerDTOs.Add(new ProviderDTO(provider));
+            var result = _providerService.getAllProviders();
+            if (result.IsSuccess == true) { 
+                return Ok(result.Value);
             }
 
-            return Ok(providerDTOs);
+            return NotFound(result.Error);
         }
 
         [HttpGet("{id}")]
         [Authorize(Policy = "adminOnly")]
         public IActionResult GetProvider(long id) {
-            var provider = _providerRepository.GetProviderById(id);
+            var result = _providerService.getProviderById(id);
 
-            if (provider == null) {
-                return NotFound();
+            if (result.IsSuccess == true) {
+                return Ok(result.Value);
             }
 
-            return Ok(new ProviderDTO(provider));
+            return NotFound(result.Error);
         }
 
         [HttpPost]
         [Authorize(Policy = "adminOnly")]
         public IActionResult CreateProvider([FromBody] CreateProviderDto dto) {
-            var provider = _providerRepository.GetProvider(dto.Name);
-            if (provider != null) {
-                return StatusCode(500, "Provider already exists");
-            }
-
-            bool banderaRepetido = false;  
-            foreach (var zone in dto.Zones) {
-                if (provider.Zones.Select(z => z.Name.Equals(zone.Name)).Any()) { 
-                    banderaRepetido = true;    
-                }
-            }
-            if (banderaRepetido) {
-                return StatusCode(500, "Zone on Provider already exists");
-            }
-
-            foreach (var service in dto.ServiceTypes) {
-                if (provider.ServiceTypes.Select(z => z.Name.Equals(service.Name)).Any()) {
-                    banderaRepetido = true;
-                }
-            }
-            if (banderaRepetido) {
-                return StatusCode(500, "ServiceType on Provider already exists");
-            }
-
-            var newProvider = new Provider { Name = dto.Name };
-
-            _providerRepository.Save(newProvider);
-            var aux = _providerRepository.GetProvider(newProvider.Name);
-
-            foreach (var zone in dto.Zones) {
-                var newZone = new Zone { Name = zone.Name, BasePrice = zone.BasePrice , ProviderId = aux.Id};
-                _zoneRepository.Save(newZone);
-            }
-
-            foreach (var service in dto.ServiceTypes) {
-                var newservice = new ServiceType { Name = service.Name, PriceMultiplier = service.PriceMultiplier, ProviderId = aux.Id };
-                _serviceTypeRepository.Save(newservice);
-            }
-
+            
+           
             return Ok();
         }
 

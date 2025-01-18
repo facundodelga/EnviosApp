@@ -5,5 +5,6 @@ namespace EnviosApp.Repository
     public interface ICountryRepository
     {
         //IEnumerable<Country> GetCountriesByZone(int zoneId);
+        Country GetCountryByName(string name);
     }
 }

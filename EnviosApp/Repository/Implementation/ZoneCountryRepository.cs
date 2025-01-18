@@ -7,6 +7,11 @@ namespace EnviosApp.Repository.Implementation {
         public Zone FindByProviderCountry(long providerId, long countryId) {
             return FindByCondition(zc => zc.CountryId == countryId && zc.Zone.ProviderId == providerId).Select(zc => zc.Zone).FirstOrDefault();
         }
+
+        public void Save(ZoneCountry country) { 
+            Create(country);
+            SaveChanges();  
+        }
     }
 
 }

@@ -8,21 +8,21 @@ namespace EnviosApp.Repository.Implementation {
         public Provider GetProvider(string name) {
             return FindByCondition(p => p.Name.ToLower().Equals(name))
                 .Include(p => p.ServiceTypes)
-                .Include(p => p.Zones)
+                .Include(p => p.Zones).ThenInclude(z => z.ZoneCountries).ThenInclude(zc => zc.Country)
                 .FirstOrDefault();
         }
 
         public Provider GetProviderById(long id) {
             return FindByCondition(p => p.Id == id)
                 .Include(p => p.ServiceTypes)
-                .Include(p => p.Zones)
+                .Include(p => p.Zones).ThenInclude(z => z.ZoneCountries).ThenInclude(zc => zc.Country)
                 .FirstOrDefault();
         }
 
         public IEnumerable<Provider> GetProvidersWithZones() {
             return FindAll()
                 .Include(p => p.ServiceTypes)
-                .Include(p => p.Zones)
+                .Include(p => p.Zones).ThenInclude(z => z.ZoneCountries).ThenInclude(zc => zc.Country)
                 .ToList();
         }
 
