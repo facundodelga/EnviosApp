@@ -4,16 +4,14 @@
         public string Name { get; set; } // Ejemplo: Zona 1, Zona A
         public decimal BasePrice { get; set; } // Precio base
 
-        public List<string> Countries { get; set; } = new List<string>();   
+        public List<ZoneCountryDTO> Countries { get; set; } = new List<ZoneCountryDTO>();   
 
         public ZoneDTO(Zone zone) {
             Id = zone.Id;
             Name = zone.Name;
             BasePrice = zone.BasePrice;
 
-            foreach (var zonecountry in zone.ZoneCountries) { 
-                Countries.Add(zonecountry.Country.Name);
-            }
+            Countries = zone.ZoneCountries.Select(x => new ZoneCountryDTO(x)).ToList();
         }
     }
 }

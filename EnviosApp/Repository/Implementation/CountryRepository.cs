@@ -11,6 +11,16 @@ namespace EnviosApp.Repository.Implementation
             return FindByCondition(c => c.Name == name).FirstOrDefault();    
         }
 
+        public Country GetCountryByAlpha(string name) {
+            return FindByCondition(c => c.Name == name).FirstOrDefault();
+        }
+
+        public IEnumerable<Country> GetCountries() {
+            return FindAll().ToList();
+        }
+
+
+
         //public IEnumerable<Country> GetCountriesByZone(int zoneId)
         //{
         //    return FindByCondition(country => country.ZoneCountries.Any(zc => zc.ZoneId == zoneId)).ToList();

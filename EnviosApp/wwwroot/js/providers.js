@@ -132,6 +132,31 @@ function addService() {
     container.appendChild(serviceDiv);
 }
 
+async function loadCountries() {
+    try {
+        const response = await fetch('/api/countries', {
+            headers: {
+                'Authorization': `Bearer ${jwt}`
+            }
+        });
+        const countries = await response.json();
+
+        // Llena todos los selects de países con la lista obtenida
+        document.querySelectorAll('.country-select').forEach(select => {
+            select.innerHTML = '<option value="" disabled selected>Seleccione un país</option>';
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.alpha; // Usar 'alpha' como value
+                option.textContent = country.name; // Mostrar 'name' como texto visible
+                select.appendChild(option);
+            });
+        });
+    } catch (error) {
+        console.error('Error al cargar países:', error);
+        showToast('Error al cargar los países', 'error');
+    }
+}
+
 // Agregar nueva zona
 function addZone() {
     const container = document.getElementById('zonesContainer');
@@ -155,7 +180,9 @@ function addZone() {
             <div class="countries-container">
                 <div class="row mb-2">
                     <div class="col-md-11">
-                        <input type="text" class="form-control" placeholder="País" required>
+                        <select class="form-select country-select" required>
+                            <option value="" disabled selected>Seleccione un país</option>
+                        </select>
                     </div>
                     <div class="col-md-1">
                         <button type="button" class="btn btn-danger" onclick="removeCountry(this)">
@@ -174,12 +201,22 @@ function addZone() {
 
 // Agregar país a una zona
 function addCountry(button) {
-    const container = button.previousElementSibling;
-    const countryDiv = document.createElement('div');
-    countryDiv.className = 'row mb-2';
-    countryDiv.innerHTML = `
+    const zoneEntry = button.closest('.zone-entry');
+    const countriesContainer = zoneEntry.querySelector('.countries-container');
+    
+    if (!countriesContainer) {
+        console.error('No se encontró el contenedor de países para agregar.');
+        return;
+    }
+
+    // Crear una nueva fila sin afectar las existentes
+    const newRow = document.createElement('div');
+    newRow.className = 'row mb-2';
+    newRow.innerHTML = `
         <div class="col-md-11">
-            <input type="text" class="form-control" placeholder="País" required>
+            <select class="form-select country-select" required>
+                <option value="" disabled selected>Seleccione un país</option>
+            </select>
         </div>
         <div class="col-md-1">
             <button type="button" class="btn btn-danger" onclick="removeCountry(this)">
@@ -187,8 +224,38 @@ function addCountry(button) {
             </button>
         </div>
     `;
-    container.appendChild(countryDiv);
+
+    // Agregar la nueva fila al final del contenedor
+    countriesContainer.appendChild(newRow);
+
+    // Cargar las opciones solo en el nuevo select
+    const newSelect = newRow.querySelector('.country-select');
+    loadCountriesForSelect(newSelect); // Necesitamos crear esta nueva función
 }
+
+// Nueva función para cargar países en un select específico
+async function loadCountriesForSelect(select) {
+    try {
+        const response = await fetch('/api/countries', {
+            headers: {
+                'Authorization': `Bearer ${jwt}`
+            }
+        });
+        const countries = await response.json();
+
+        select.innerHTML = '<option value="" disabled selected>Seleccione un país</option>';
+        countries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country.alpha;
+            option.textContent = country.name;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error al cargar países:', error);
+        showToast('Error al cargar los países', 'error');
+    }
+}
+
 
 // Funciones para eliminar elementos
 function removeService(button) {
@@ -227,17 +294,17 @@ async function saveProvider() {
 
     // Recolectar zonas y países
     document.querySelectorAll('.zone-entry').forEach(zoneEl => {
-        const zoneInputs = zoneEl.querySelectorAll('.card-body > .row input');
+        const zoneInputs = zoneEl.querySelectorAll('.row input');
         const countries = [];
-        
-        zoneEl.querySelectorAll('.countries-container .row input').forEach(countryInput => {
-            countries.push(countryInput.value);
+    
+        zoneEl.querySelectorAll('.countries-container .row .country-select').forEach(countrySelect => {
+            countries.push(countrySelect.value); // Recoge el código alpha del país seleccionado
         });
-
+    
         providerData.zones.push({
             name: zoneInputs[0].value,
             basePrice: parseFloat(zoneInputs[1].value),
-            countries: countries
+            countries: countries // Agregar países seleccionados
         });
     });
 
@@ -268,22 +335,24 @@ async function saveProvider() {
 }
 
 // Mostrar formulario para nuevo proveedor
-function showAddProviderForm() {
+async function showAddProviderForm() {
     document.getElementById('providerForm').reset();
     document.getElementById('providerForm').removeAttribute('data-provider-id');
     document.getElementById('modalTitle').textContent = 'Nuevo Proveedor';
     
-    // Limpiar formulario
+    // Limpiar formularios y agregar una entrada inicial
     document.getElementById('servicesContainer').innerHTML = '';
     document.getElementById('zonesContainer').innerHTML = '';
-    
-    // Agregar una entrada inicial para servicio y zona
     addService();
     addZone();
-    
+
+    // Cargar lista de países
+    await loadCountries();
+
     const modal = new bootstrap.Modal(document.getElementById('providerModal'));
     modal.show();
 }
+
 
 // Editar proveedor existente
 async function editProvider(providerId) {
@@ -295,51 +364,76 @@ async function editProvider(providerId) {
         });
         const provider = await response.json();
 
-        // Configurar formulario
+        console.log('Datos del proveedor:', provider);
+
+        // Cargar países y servicios antes de asignar valores
+        await loadCountries();
+
+        // Configurar datos del proveedor
         document.getElementById('name').value = provider.name;
         document.getElementById('providerForm').dataset.providerId = providerId;
         document.getElementById('modalTitle').textContent = 'Editar Proveedor';
 
-        // Limpiar contenedores existentes
+        // Limpiar servicios y zonas
         document.getElementById('servicesContainer').innerHTML = '';
         document.getElementById('zonesContainer').innerHTML = '';
 
         // Cargar servicios
         provider.serviceTypes.forEach(service => {
             addService();
-            const serviceEntry = document.querySelector('.service-entry:last-child');
-            const inputs = serviceEntry.querySelectorAll('input');
-            inputs[0].value = service.name;
-            inputs[1].value = service.priceMultiplier;
+
+            const lastService = document.querySelector('.service-entry:last-child');
+            if (lastService) {
+                const inputs = lastService.querySelectorAll('input');
+                if (inputs[0]) inputs[0].value = service.name;
+                if (inputs[1]) inputs[1].value = service.priceMultiplier;
+            }
         });
 
         // Cargar zonas y países
         provider.zones.forEach(zone => {
             addZone();
-            const zoneEntry = document.querySelector('.zone-entry:last-child');
-            const zoneInputs = zoneEntry.querySelectorAll('.card-body > .row input');
-            zoneInputs[0].value = zone.name;
-            zoneInputs[1].value = zone.basePrice;
-            
-            // Limpiar países por defecto
-            zoneEntry.querySelector('.countries-container').innerHTML = '';
 
-            // Agregar países
+            const lastZone = document.querySelector('.zone-entry:last-child');
+            const zoneInputs = lastZone.querySelectorAll('.row input');
+            if (zoneInputs[0]) zoneInputs[0].value = zone.name;
+            if (zoneInputs[1]) zoneInputs[1].value = zone.basePrice;
+
+            const countryContainer = lastZone.querySelector('.countries-container');
+            if (!countryContainer) return;
+
+            countryContainer.innerHTML = '';
+
             zone.countries.forEach(country => {
-                addCountry(zoneEntry.querySelector('.btn-secondary'));
-                const lastCountryInput = zoneEntry.querySelector('.countries-container .row:last-child input');
-                lastCountryInput.value = country;
+                addCountry(lastZone.querySelector('.btn-secondary'));
+                const lastCountryInput = countryContainer.querySelector('.row:last-child .country-select');
+                
+                if (lastCountryInput) {
+                    // Dar tiempo a que se carguen las opciones
+                    setTimeout(() => {
+                        lastCountryInput.value = country.alpha;
+                        
+                        // Si no funcionó, intentar selección directa
+                        if (!lastCountryInput.value) {
+                            Array.from(lastCountryInput.options).forEach((option, index) => {
+                                if (option.value === country.alpha) {
+                                    lastCountryInput.selectedIndex = index;
+                                }
+                            });
+                        }
+                    }, 100);
+                }
             });
-            
         });
 
+        // Mostrar el modal
         const modal = new bootstrap.Modal(document.getElementById('providerModal'));
         modal.show();
     } catch (error) {
         console.error('Error al cargar el proveedor:', error);
-        showToast('Error al cargar el proveedor', 'error');
     }
 }
+
 
 // Eliminar proveedor
 async function deleteProvider(providerId) {
