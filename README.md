@@ -1,7 +1,3 @@
-Here is the English version of your `README.md` for GitHub:  
-
----
-
 # **EnviosApp - Shipping and Provider Management System**  
 
 ## 📦 Project Description  
@@ -48,10 +44,6 @@ cd EnviosApp
   dotnet run
   ```
 
-### **3. Configure the Frontend**  
-- Open the `index.html` file in a browser.  
-- If necessary, configure the API base URL in `js/config.js`.  
-
 ## 🔑 Access and Authentication  
 - An **admin** user can manage providers, users, and settings.  
 - A **standard user** can only create and view shipments.  
@@ -64,9 +56,3 @@ If you want to contribute:
 4. Push to the branch (`git push origin feature/new-feature`).  
 5. Open a Pull Request.  
 
-## 📄 License  
-This project is licensed under the **MIT** License.  
-
----
-
-Let me know if you need any modifications or additional details! 😊
