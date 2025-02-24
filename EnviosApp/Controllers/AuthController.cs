@@ -30,6 +30,7 @@ namespace EnviosApp.Controllers
             }
             try {
                 var user = _userRepository.FindByUserName(loginDTO.Username);
+
                 if (user == null || user.Password != loginDTO.Password)
                     return BadRequest("User notFound");
 
