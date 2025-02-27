@@ -4,8 +4,10 @@ using EnviosApp.Models;
 using EnviosApp.Models.DTOs;
 using EnviosApp.Controllers;
 using Humanizer;
+using EnviosApp.Models.DTOs.UpdateProvider;
 
-namespace EnviosApp.Services {
+namespace EnviosApp.Services
+{
     public class ProviderService : IProviderService {
         private IProviderRepository _providerRepository;
         private IServiceTypeRepository _serviceTypeRepository;
@@ -121,5 +123,66 @@ namespace EnviosApp.Services {
             return Result<string>.Success("Provider created");
         }
 
+
+        public Result<string> updateProvider(long id, UpdateProviderDTO dto) {
+            var provider = _providerRepository.GetProviderByIdNoCountry(id);
+            if (provider == null) {
+                return Result<string>.Failure("Provider not found.");
+            }
+
+            var providerByName = _providerRepository.GetProviderOnly(dto.Name);
+            if (providerByName != null && providerByName.Id != provider.Id) {
+                return Result<string>.Failure("Provider name already exists");
+            }
+            else {
+                provider.Name = dto.Name; // Actualizar el nombre del proveedor
+            }
+
+            // Actualizar zonas
+            foreach (var zoneDTO in dto.Zones) {
+                var existingZone = provider.Zones.FirstOrDefault(z => z.Id == zoneDTO.Id);
+                if (existingZone != null) {
+                    existingZone.Name = zoneDTO.Name;
+                    existingZone.BasePrice = zoneDTO.BasePrice;
+
+                    // Actualizar países
+                    var currentCountries = existingZone.ZoneCountries.ToList();
+                    foreach (var zoneCountry in currentCountries) {
+                        existingZone.ZoneCountries.Remove(zoneCountry);
+                    }
+
+                    foreach (var countryDTO in zoneDTO.Countries) {
+                        var country = _countryRepository.GetCountryByName(countryDTO.Name);
+                        if (country != null) {
+                            existingZone.ZoneCountries.Add(new ZoneCountry {
+                                ZoneId = existingZone.Id,
+                                CountryId = country.Id,
+                                Country = country
+                            });
+                        }
+                    }
+                }
+                else {
+                    // Si la zona no existe, crear una nueva
+                    var newZone = new Zone {
+                        Name = zoneDTO.Name,
+                        BasePrice = zoneDTO.BasePrice,
+                        ZoneCountries = zoneDTO.Countries
+                            .Select(c => new ZoneCountry { Country = _countryRepository.GetCountryByName(c.Name) })
+                            .ToList()
+                    };
+                    provider.Zones.Add(newZone);
+                }
+            }
+
+            _providerRepository.Update(provider);
+
+            return Result<string>.Success("Provider created");
+        }
+
+        
+
     }
+
+
 }

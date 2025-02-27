@@ -12,10 +12,27 @@ namespace EnviosApp.Repository.Implementation {
                 .FirstOrDefault();
         }
 
+        public Provider GetProviderOnly(string name) {
+            return FindByCondition(p => p.Name.ToLower().Equals(name))
+                .FirstOrDefault();
+        }
+
+        public Provider GetProviderNoCountry(string name) {
+            return FindByCondition(p => p.Name.ToLower().Equals(name))
+                .Include(p => p.ServiceTypes)
+                .Include(p => p.Zones).ThenInclude(z => z.ZoneCountries).FirstOrDefault();
+        }
+
         public Provider GetProviderById(long id) {
             return FindByCondition(p => p.Id == id)
                 .Include(p => p.ServiceTypes)
-                .Include(p => p.Zones).ThenInclude(z => z.ZoneCountries).ThenInclude(zc => zc.Country)
+                .Include(p => p.Zones).ThenInclude(z => z.ZoneCountries).ThenInclude(zc => zc.Country).AsNoTracking()
+                .FirstOrDefault();
+        }
+        public Provider GetProviderByIdNoCountry(long id) {
+            return FindByCondition(p => p.Id == id)
+                .Include(p => p.ServiceTypes)
+                .Include(p => p.Zones).ThenInclude(z => z.ZoneCountries).AsNoTracking()
                 .FirstOrDefault();
         }
 
@@ -28,6 +45,17 @@ namespace EnviosApp.Repository.Implementation {
 
         public void Save(Provider provider) {
             Create(provider);
+            SaveChanges();
+        }
+
+        public void Update(Provider provider) {
+            Update(provider);
+            SaveChanges();
+
+        }
+
+        public void Remove(Provider provider) {
+            Delete(provider);
             SaveChanges();
         }
     }

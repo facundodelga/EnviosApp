@@ -6,6 +6,8 @@ namespace EnviosApp.Repository
     {
         IEnumerable<Zone> GetZonesByProvider(long providerId);
         Zone GetZoneByProviderAndName(long providerId, string name);
+        Zone GetZoneById(long Id);
         void Save(Zone newZone);
+        
     }
 }

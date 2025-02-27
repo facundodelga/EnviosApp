@@ -32,7 +32,7 @@ namespace EnviosApp.Controllers
                 var user = _userRepository.FindByUserName(loginDTO.Username);
 
                 if (user == null || user.Password != loginDTO.Password)
-                    return BadRequest("User notFound");
+                    return StatusCode(403, "User not found" );
 
 
                 var claims = new List<Claim>();
@@ -67,7 +67,7 @@ namespace EnviosApp.Controllers
                 var tokenConfig = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenjwt = tokenHandler.WriteToken(tokenConfig);
                 //devuelvo el token para almacenarlo en el navegador
-                return Ok(new { message = "Inicio de sesión exitoso", token = tokenjwt });
+                return Ok(new { message = "Inicio de sesión exitoso", token = tokenjwt , ok = true});
             }
             catch (Exception ex) {
             

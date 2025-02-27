@@ -1,4 +1,5 @@
-﻿namespace EnviosApp.Models
+﻿
+namespace EnviosApp.Models
 {
     public class Country
     {
@@ -8,5 +9,12 @@
 
         ////Relación muchos a muchos con Zone
         public ICollection<ZoneCountry> ZoneCountries { get; set; }
+
+        public override bool Equals(object? obj) {
+            return obj is Country country &&
+                   Id == country.Id &&
+                   Alpha == country.Alpha &&
+                   Name == country.Name;
+        }
     }
 }

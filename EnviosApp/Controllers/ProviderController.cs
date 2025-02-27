@@ -1,5 +1,5 @@
 ﻿using EnviosApp.Models;
-using EnviosApp.Models.DTOs;
+using EnviosApp.Models.DTOs.UpdateProvider;
 using EnviosApp.Repository;
 using EnviosApp.Repository.Implementation;
 using EnviosApp.Services;
@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace EnviosApp.Controllers {
+namespace EnviosApp.Controllers
+{
     [Route("api/[controller]")]
     [ApiController]
     public class ProviderController : ControllerBase {
@@ -46,24 +47,21 @@ namespace EnviosApp.Controllers {
         [HttpPost]
         [Authorize(Policy = "adminOnly")]
         public IActionResult CreateProvider([FromBody] CreateProviderDto dto) {
-            
+            var result = _providerService.addProvider(dto);
+            if(!result.IsSuccess)
+                return BadRequest(result.Error);
            
-            return Ok();
+            return Ok(result.Value);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateProvider(long id, UpdateProviderDto dto) {
-        //    var provider = await _context.Providers.FindAsync(id);
+        [HttpPut("{id}")]
+        public IActionResult UpdateProvider(long id, [FromBody] UpdateProviderDTO dto) {
+            var result = _providerService.updateProvider(id, dto);
+            
+            if(!result.IsSuccess) { return BadRequest(result.Error); }
 
-        //    if (provider == null) {
-        //        return NotFound();
-        //    }
-
-        //    provider.Name = dto.Name;
-        //    await _context.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
         //[HttpDelete("{id}")]
         //public async Task<IActionResult> DeleteProvider(long id) {

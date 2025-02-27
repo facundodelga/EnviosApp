@@ -19,6 +19,10 @@ namespace EnviosApp.Repository.Implementation
             return FindAll().ToList();
         }
 
+        public IEnumerable<Country> SearchByName(string search) {
+            return FindByCondition(c => c.Name.Contains(search)).ToList();
+        }
+
 
 
         //public IEnumerable<Country> GetCountriesByZone(int zoneId)

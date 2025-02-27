@@ -79,27 +79,6 @@ function displayProviders(providers) {
         tbody.appendChild(tr);
     });
 }
-/*
-  {
-    "id": 1,
-    "name": "DHL",
-    "zones": [
-      {
-        "id": 1,
-        "name": "Zona 1",
-        "basePrice": 2
-      }
-    ],
-    "serviceTypes": [
-      {
-        "id": 1,
-        "name": "DHL Economy",
-        "priceMultiplier": 0.5
-      }
-    ]
-  }
-]
-*/ 
 
 // Formatear servicios para mostrar en la tabla
 function formatServices(services) {
@@ -135,19 +114,17 @@ function addService() {
 async function loadCountries() {
     try {
         const response = await fetch('/api/countries', {
-            headers: {
-                'Authorization': `Bearer ${jwt}`
-            }
+            headers: { 'Authorization': `Bearer ${jwt}` }
         });
         const countries = await response.json();
 
-        // Llena todos los selects de países con la lista obtenida
         document.querySelectorAll('.country-select').forEach(select => {
             select.innerHTML = '<option value="" disabled selected>Seleccione un país</option>';
             countries.forEach(country => {
                 const option = document.createElement('option');
-                option.value = country.alpha; // Usar 'alpha' como value
-                option.textContent = country.name; // Mostrar 'name' como texto visible
+                option.value = country.alpha;  // Código Alpha como value
+                option.textContent = country.name;  // Nombre del país
+                option.dataset.countryId = country.id; // ✅ Guardar ID en dataset
                 select.appendChild(option);
             });
         });
@@ -156,6 +133,7 @@ async function loadCountries() {
         showToast('Error al cargar los países', 'error');
     }
 }
+
 
 // Agregar nueva zona
 function addZone() {
@@ -203,20 +181,18 @@ function addZone() {
 function addCountry(button) {
     const zoneEntry = button.closest('.zone-entry');
     const countriesContainer = zoneEntry.querySelector('.countries-container');
-    
+
     if (!countriesContainer) {
         console.error('No se encontró el contenedor de países para agregar.');
         return;
     }
 
-    // Crear una nueva fila sin afectar las existentes
+    // Crear una nueva fila con un select de Select2
     const newRow = document.createElement('div');
     newRow.className = 'row mb-2';
     newRow.innerHTML = `
         <div class="col-md-11">
-            <select class="form-select country-select" required>
-                <option value="" disabled selected>Seleccione un país</option>
-            </select>
+            <select class="form-control country-select" style="width: 100%;" required></select>
         </div>
         <div class="col-md-1">
             <button type="button" class="btn btn-danger" onclick="removeCountry(this)">
@@ -225,37 +201,13 @@ function addCountry(button) {
         </div>
     `;
 
-    // Agregar la nueva fila al final del contenedor
+    // Agregar la nueva fila al contenedor
     countriesContainer.appendChild(newRow);
 
-    // Cargar las opciones solo en el nuevo select
+    // Inicializar Select2 en el nuevo select
     const newSelect = newRow.querySelector('.country-select');
-    loadCountriesForSelect(newSelect); // Necesitamos crear esta nueva función
+    loadCountriesForSelect(newSelect);
 }
-
-// Nueva función para cargar países en un select específico
-async function loadCountriesForSelect(select) {
-    try {
-        const response = await fetch('/api/countries', {
-            headers: {
-                'Authorization': `Bearer ${jwt}`
-            }
-        });
-        const countries = await response.json();
-
-        select.innerHTML = '<option value="" disabled selected>Seleccione un país</option>';
-        countries.forEach(country => {
-            const option = document.createElement('option');
-            option.value = country.alpha;
-            option.textContent = country.name;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error al cargar países:', error);
-        showToast('Error al cargar los países', 'error');
-    }
-}
-
 
 // Funciones para eliminar elementos
 function removeService(button) {
@@ -268,70 +220,6 @@ function removeZone(button) {
 
 function removeCountry(button) {
     button.closest('.row').remove();
-}
-
-async function saveProvider() {
-    const form = document.getElementById('providerForm');
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-
-    const providerData = {
-        name: document.getElementById('name').value,
-        services: [],
-        zones: []
-    };
-
-    // Recolectar servicios
-    document.querySelectorAll('.service-entry').forEach(serviceEl => {
-        const inputs = serviceEl.querySelectorAll('input');
-        providerData.services.push({
-            name: inputs[0].value,
-            multiplier: parseFloat(inputs[1].value)
-        });
-    });
-
-    // Recolectar zonas y países
-    document.querySelectorAll('.zone-entry').forEach(zoneEl => {
-        const zoneInputs = zoneEl.querySelectorAll('.row input');
-        const countries = [];
-    
-        zoneEl.querySelectorAll('.countries-container .row .country-select').forEach(countrySelect => {
-            countries.push(countrySelect.value); // Recoge el código alpha del país seleccionado
-        });
-    
-        providerData.zones.push({
-            name: zoneInputs[0].value,
-            basePrice: parseFloat(zoneInputs[1].value),
-            countries: countries // Agregar países seleccionados
-        });
-    });
-
-    try {
-        const isEditing = !!document.getElementById('providerForm').dataset.providerId;
-        const url = isEditing 
-            ? `/api/provider/${document.getElementById('providerForm').dataset.providerId}`
-            : '/api/provider';
-        
-        const response = await fetch(url, {
-            method: isEditing ? 'PUT' : 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwt}`
-            },
-            body: JSON.stringify(providerData)
-        });
-
-        if (!response.ok) throw new Error('Error en la respuesta del servidor');
-
-        bootstrap.Modal.getInstance(document.getElementById('providerModal')).hide();
-        loadProviders();
-        showToast(isEditing ? 'Proveedor actualizado con éxito' : 'Proveedor creado con éxito', 'success');
-    } catch (error) {
-        console.error('Error al guardar el proveedor:', error);
-        showToast('Error al guardar el proveedor', 'error');
-    }
 }
 
 // Mostrar formulario para nuevo proveedor
@@ -384,6 +272,7 @@ async function editProvider(providerId) {
 
             const lastService = document.querySelector('.service-entry:last-child');
             if (lastService) {
+                lastService.dataset.serviceId = service.id; // Guardar ID del servicio
                 const inputs = lastService.querySelectorAll('input');
                 if (inputs[0]) inputs[0].value = service.name;
                 if (inputs[1]) inputs[1].value = service.priceMultiplier;
@@ -395,6 +284,8 @@ async function editProvider(providerId) {
             addZone();
 
             const lastZone = document.querySelector('.zone-entry:last-child');
+            lastZone.dataset.zoneId = zone.id; // Guardar ID de la zona
+
             const zoneInputs = lastZone.querySelectorAll('.row input');
             if (zoneInputs[0]) zoneInputs[0].value = zone.name;
             if (zoneInputs[1]) zoneInputs[1].value = zone.basePrice;
@@ -407,12 +298,12 @@ async function editProvider(providerId) {
             zone.countries.forEach(country => {
                 addCountry(lastZone.querySelector('.btn-secondary'));
                 const lastCountryInput = countryContainer.querySelector('.row:last-child .country-select');
-                
+            
                 if (lastCountryInput) {
                     // Dar tiempo a que se carguen las opciones
                     setTimeout(() => {
                         lastCountryInput.value = country.alpha;
-                        
+            
                         // Si no funcionó, intentar selección directa
                         if (!lastCountryInput.value) {
                             Array.from(lastCountryInput.options).forEach((option, index) => {
@@ -420,6 +311,12 @@ async function editProvider(providerId) {
                                     lastCountryInput.selectedIndex = index;
                                 }
                             });
+                        }
+            
+                        // ✅ Asignar ID correctamente en la opción seleccionada
+                        const selectedOption = lastCountryInput.querySelector(`option[value="${country.alpha}"]`);
+                        if (selectedOption) {
+                            selectedOption.dataset.countryId = country.id;
                         }
                     }, 100);
                 }
@@ -433,6 +330,7 @@ async function editProvider(providerId) {
         console.error('Error al cargar el proveedor:', error);
     }
 }
+
 
 
 // Eliminar proveedor
@@ -500,4 +398,129 @@ function showToast(message, type = 'info') {
 function logout() {
     localStorage.removeItem('jwt');
     window.location.href = '/index.html';
+}
+
+
+
+
+
+async function loadCountriesForSelect(selectElement) {
+    // Inicializar Select2 en el select
+    $(selectElement).select2({
+        placeholder: "Buscar país...",
+        allowClear: true,
+        dropdownParent: $(selectElement).closest('.modal'), // Renderizar dentro del modal
+        ajax: {
+            url: '/api/countries', // Endpoint para cargar países
+            headers: {
+                'Authorization': `Bearer ${jwt}`
+            },
+            dataType: 'json',
+            delay: 250, // Retardo para evitar muchas solicitudes
+            data: function (params) {
+                return {
+                    search: params.term, // Término de búsqueda
+                    
+                };
+            },
+            processResults: function (data, params) {
+                // Procesar los resultados de la API
+                return {
+                    results: data.map(country => ({
+                        id: country.alpha, // Código alpha del país
+                        text: country.name // Nombre del país
+                    })),
+                    pagination: {
+                        more: false // No hay paginación en este ejemplo
+                    }
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 1 // Mínimo de caracteres para realizar la búsqueda
+    });
+}
+
+
+async function saveProvider() {
+    const form = document.getElementById('providerForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const isEditing = !!document.getElementById('providerForm').dataset.providerId;
+    const providerId = isEditing ? document.getElementById('providerForm').dataset.providerId : null;
+
+    const providerData = {
+        id: providerId,
+        name: document.getElementById('name').value,
+        serviceTypes: [],
+        zones: []
+    };
+
+    // Obtener servicios
+    document.querySelectorAll('.service-entry').forEach(serviceEl => {
+        const inputs = serviceEl.querySelectorAll('input');
+        providerData.serviceTypes.push({
+            id: serviceEl.dataset.serviceId || null,
+            name: inputs[0].value,
+            priceMultiplier: parseFloat(inputs[1].value)
+        });
+    });
+
+    // Obtener zonas y países
+    document.querySelectorAll('.zone-entry').forEach(zoneEl => {
+        const zoneId = zoneEl.dataset.zoneId || null;
+        const zoneInputs = zoneEl.querySelectorAll('.row input');
+        const countries = [];
+
+        zoneEl.querySelectorAll('.country-select').forEach(countrySelect => {
+            const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+
+            if (selectedOption) {
+                countries.push({
+                    
+                    name: selectedOption.text,  
+                    alpha: selectedOption.value  
+                });
+            }
+        });
+
+        providerData.zones.push({
+            id: zoneId,
+            name: zoneInputs[0].value,
+            basePrice: parseFloat(zoneInputs[1].value),
+            countries: countries
+        });
+    });
+
+    console.log('Datos enviados al backend:', JSON.stringify(providerData, null, 2));
+
+    try {
+        const url = isEditing 
+            ? `/api/provider/${providerId}`
+            : '/api/provider';
+        
+        const response = await fetch(url, {
+            method: isEditing ? 'PUT' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwt}`
+            },
+            body: JSON.stringify(providerData)
+        });
+
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(`Error en la respuesta del servidor: ${errorMessage}`);
+        }
+
+        bootstrap.Modal.getInstance(document.getElementById('providerModal')).hide();
+        loadProviders();
+        showToast(isEditing ? 'Proveedor actualizado con éxito' : 'Proveedor creado con éxito', 'success');
+    } catch (error) {
+        console.error('Error al guardar el proveedor:', error);
+        showToast('Error al guardar el proveedor', 'error');
+    }
 }

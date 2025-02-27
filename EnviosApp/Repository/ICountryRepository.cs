@@ -8,5 +8,6 @@ namespace EnviosApp.Repository
         Country GetCountryByName(string name);
         Country GetCountryByAlpha(string name);
         IEnumerable<Country> GetCountries();
+        IEnumerable<Country> SearchByName(string search);
     }
 }

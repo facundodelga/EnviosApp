@@ -18,9 +18,15 @@ namespace EnviosApp.Repository.Implementation
                 ThenInclude(c => c.Country).AsEnumerable();
         }
 
+        public Zone GetZoneById(long Id) { 
+            return FindByCondition ( z => z.Id == Id).Include(z => z.ZoneCountries).FirstOrDefault();
+        }
+
         public void Save(Zone newZone) {
             Create(newZone);
             SaveChanges();  
         }
+
+        
     }
 }

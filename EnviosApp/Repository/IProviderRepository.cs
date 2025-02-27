@@ -7,5 +7,10 @@ namespace EnviosApp.Repository.Implementation {
         Provider GetProviderById(long id);
 
         void Save(Provider provider);
+        void Update(Provider provider);
+        void Remove(Provider provider);
+        Provider GetProviderNoCountry(string name);
+        Provider GetProviderByIdNoCountry(long id);
+        Provider GetProviderOnly(string name);
     }
 }
