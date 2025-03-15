@@ -1,43 +1,58 @@
 import React from 'react';
-import FormInput from './LoginFormInput';
-import SubmitButton from './LoginSubmitButton';
-import login from '../services/LoginService';
+import loginUser from '../services/LoginService';
+import { useState } from 'react';
 
 const LoginContainer = () => {
-    const submitForm = (event) => {
-        event.preventDefault();
-        const username = event.target.username.value;
-        const password = event.target.password.value;
+    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [error, setError] = useState(false);
 
-        login({ username, password })
-            .then((response) => {
-                if (response.success) {
-                    console.log('Login successful:', response.data);
-                    // Handle successful login (e.g., redirect or store token)
-                } else {
-                    const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.style.display = 'block';
-                    errorMessage.textContent = response.message || 'Error al iniciar sesión';
-                }
-            })
-            .catch((error) => {
-                console.error('Login error:', error);
-                const errorMessage = document.getElementById('errorMessage');
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = 'Error al conectar con el servidor';
-            });
+    const submitForm = async (event) => {
+        event.preventDefault();
+        if(name === '' || password === '') {
+            setError(true);
+            setErrorMessage('Username and password are required');
+            return;
+        }
+        const response = await loginUser(name, password);
+        
+        if(response.status === 200) {
+            const payload = await response.json();
+            // Guardar el token en el local storage
+            localStorage.setItem('token', payload.token);
+            // Redirigir al usuario a la página de inicio
+            window.location.href = '/';
+        }
+        else {
+            setError(true);
+            setErrorMessage(response.message);
+        }
+
+            
     };
 
     return (
-        <div className="login-container">
+        <section className='login-container'>
+
             <h2>Iniciar Sesión</h2>
-            <form id="loginForm" onSubmit={submitForm}>
-                <FormInput label="Usuario" type="text" id="username" name="username" required />
-                <FormInput label="Contraseña" type="password" id="password" name="password" required />
-                <div id="errorMessage" style={{ color: 'red', display: 'none' }}></div>
-                <SubmitButton text="Ingresar" />
+            
+            <form className="form-group" onSubmit={submitForm}>
+                {error && <p style={{ color: 'red'  }}>{errorMessage}</p>}
+                <input placeholder="Username" type="text"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                />
+                <input placeholder="Password" type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                />
+                <button type="submit">Iniciar Sesión</button>
+                
             </form>
-        </div>
+            
+        </section>
+
     );
 };
 

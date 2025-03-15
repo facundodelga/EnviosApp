@@ -1,29 +1,20 @@
-async function login() {
-    const form = document.getElementById('loginForm');
-    const formData = new FormData(form);
-    const errorMessageElement = document.getElementById('errorMessage');
+import { API_BASE_URL } from "../config";
 
-    // Convertir los datos del formulario a un objeto JSON
-    const jsonData = {};
-    formData.forEach((value, key) => {
-        jsonData[key] = value;
-    });
-
-    // Enviar la solicitud usando fetch
+const loginUser = async (username, password) => {
     try {
-        const response = await fetch('http://localhost:5056/api/Auth/login', {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(jsonData),
+            body: JSON.stringify({ username, password }),
         });
-
-        return await response.json();
+        return response;
     } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        errorMessageElement.style.display = 'block';
-        errorMessageElement.textContent = 'Error al conectar con el servidor';
-    }
-}
+        console.error('Error logging in:', error);
 
+        return { status: 500, message: 'Internal Server Error' };
+    }
+};
+
+export default loginUser;

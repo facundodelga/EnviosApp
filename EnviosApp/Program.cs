@@ -34,8 +34,23 @@ builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 //inyeccion de independencias servicios
 builder.Services.AddScoped<IProviderService, ProviderService>();
 
+// Configuración de CORS
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => {
+            builder.WithOrigins("http://localhost:3000")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+        });
+});
+
 //Servicios de autenticacion
 var jwtSecretKey = builder.Configuration.GetConnectionString("Jwt-Key");
+if (string.IsNullOrEmpty(jwtSecretKey)) {
+    throw new ArgumentNullException(nameof(jwtSecretKey), "La clave secreta JWT no puede ser nula o vacía.");
+}
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt => {
     var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey));
     var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256Signature);
@@ -51,12 +66,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 
     opt.Events = new JwtBearerEvents {
-        OnTokenValidated = context =>
-        {
-            var claims = context.Principal.Claims;
-            Console.WriteLine("Claims después de validación:");
-            foreach (var claim in claims) {
-                Console.WriteLine($"Claim validado - Type: {claim.Type}, Value: {claim.Value}");
+        OnTokenValidated = context => {
+            var claims = context.Principal?.Claims;
+            if (claims != null) {
+                Console.WriteLine("Claims después de validación:");
+                foreach (var claim in claims) {
+                    Console.WriteLine($"Claim validado - Type: {claim.Type}, Value: {claim.Value}");
+                }
             }
             return Task.CompletedTask;
         }
@@ -88,8 +104,6 @@ using (var scope = app.Services.CreateScope()) {
     }
 }
 
-
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Error");
@@ -103,9 +117,9 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.UseRouting();
+app.UseCors("AllowSpecificOrigin"); // Habilitar CORS con la política específica
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapRazorPages();
 
