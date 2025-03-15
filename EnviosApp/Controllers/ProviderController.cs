@@ -60,7 +60,7 @@ namespace EnviosApp.Controllers
             
             if(!result.IsSuccess) { return BadRequest(result.Error); }
 
-            return NoContent();
+            return Ok(result.Value);
         }
 
         //[HttpDelete("{id}")]

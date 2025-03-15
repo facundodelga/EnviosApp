@@ -298,27 +298,10 @@ async function editProvider(providerId) {
             zone.countries.forEach(country => {
                 addCountry(lastZone.querySelector('.btn-secondary'));
                 const lastCountryInput = countryContainer.querySelector('.row:last-child .country-select');
-            
+
                 if (lastCountryInput) {
-                    // Dar tiempo a que se carguen las opciones
-                    setTimeout(() => {
-                        lastCountryInput.value = country.alpha;
-            
-                        // Si no funcionó, intentar selección directa
-                        if (!lastCountryInput.value) {
-                            Array.from(lastCountryInput.options).forEach((option, index) => {
-                                if (option.value === country.alpha) {
-                                    lastCountryInput.selectedIndex = index;
-                                }
-                            });
-                        }
-            
-                        // ✅ Asignar ID correctamente en la opción seleccionada
-                        const selectedOption = lastCountryInput.querySelector(`option[value="${country.alpha}"]`);
-                        if (selectedOption) {
-                            selectedOption.dataset.countryId = country.id;
-                        }
-                    }, 100);
+                    // Inicializar Select2 con el país seleccionado
+                    loadCountriesForSelect(lastCountryInput, country.alpha);
                 }
             });
         });
@@ -403,8 +386,7 @@ function logout() {
 
 
 
-
-async function loadCountriesForSelect(selectElement) {
+async function loadCountriesForSelect(selectElement, selectedAlpha = null) {
     // Inicializar Select2 en el select
     $(selectElement).select2({
         placeholder: "Buscar país...",
@@ -420,7 +402,6 @@ async function loadCountriesForSelect(selectElement) {
             data: function (params) {
                 return {
                     search: params.term, // Término de búsqueda
-                    
                 };
             },
             processResults: function (data, params) {
@@ -439,6 +420,11 @@ async function loadCountriesForSelect(selectElement) {
         },
         minimumInputLength: 1 // Mínimo de caracteres para realizar la búsqueda
     });
+
+    // Si hay un país seleccionado, establecerlo como valor
+    if (selectedAlpha) {
+        $(selectElement).val(selectedAlpha).trigger('change');
+    }
 }
 
 

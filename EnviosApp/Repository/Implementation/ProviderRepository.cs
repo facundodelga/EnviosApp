@@ -43,18 +43,18 @@ namespace EnviosApp.Repository.Implementation {
                 .ToList();
         }
 
-        public void Save(Provider provider) {
+        public void SaveProvider(Provider provider) {
             Create(provider);
             SaveChanges();
         }
 
-        public void Update(Provider provider) {
+        public void UpdateProvider(Provider provider) {
             Update(provider);
             SaveChanges();
 
         }
 
-        public void Remove(Provider provider) {
+        public void RemoveProvider(Provider provider) {
             Delete(provider);
             SaveChanges();
         }

@@ -10,6 +10,6 @@ namespace EnviosApp.Services
         Result<List<ProviderDTO>> getAllProviders();
         Result<ProviderDTO> getProviderById(long id);
         Result<ProviderDTO> getProviderByName(string name);
-        Result<string> updateProvider(long id, UpdateProviderDTO dto);
+        Result<ProviderDTO> updateProvider(long id, UpdateProviderDTO dto);
     }
 }

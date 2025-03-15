@@ -91,7 +91,7 @@ namespace EnviosApp.Services
 
             var newProvider = new Provider { Name = dto.Name };
 
-            _providerRepository.Save(newProvider);
+            _providerRepository.SaveProvider(newProvider);
             var aux = _providerRepository.GetProvider(newProvider.Name);
 
             foreach (var zone in dto.Zones) {
@@ -124,15 +124,15 @@ namespace EnviosApp.Services
         }
 
 
-        public Result<string> updateProvider(long id, UpdateProviderDTO dto) {
+        public Result<ProviderDTO> updateProvider(long id, UpdateProviderDTO dto) {
             var provider = _providerRepository.GetProviderByIdNoCountry(id);
             if (provider == null) {
-                return Result<string>.Failure("Provider not found.");
+                return Result<ProviderDTO>.Failure("Provider not found.");
             }
 
             var providerByName = _providerRepository.GetProviderOnly(dto.Name);
             if (providerByName != null && providerByName.Id != provider.Id) {
-                return Result<string>.Failure("Provider name already exists");
+                return Result<ProviderDTO>.Failure("Provider name already exists");
             }
             else {
                 provider.Name = dto.Name; // Actualizar el nombre del proveedor
@@ -175,9 +175,9 @@ namespace EnviosApp.Services
                 }
             }
 
-            _providerRepository.Update(provider);
+            _providerRepository.UpdateProvider(provider);
 
-            return Result<string>.Success("Provider created");
+            return Result<ProviderDTO>.Success(new ProviderDTO(provider));
         }
 
         

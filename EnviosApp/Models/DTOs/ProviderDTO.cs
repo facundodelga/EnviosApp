@@ -3,16 +3,15 @@
 namespace EnviosApp.Models.DTOs {
     public class ProviderDTO {
         
-        [JsonProperty("id")]
+
         public long Id { get; set; }
 
-        [JsonProperty("name")]
+    
         public string Name { get; set; }
 
-        [JsonProperty("serviceTypes")]
         public List<ServiceTypeDTO> ServiceTypes { get; set; } = new List<ServiceTypeDTO>();
 
-        [JsonProperty("zones")]
+    
         public List<ZoneDTO> Zones { get; set; } = new List<ZoneDTO>();
 
        
