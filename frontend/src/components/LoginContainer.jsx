@@ -2,7 +2,8 @@ import React from 'react';
 import loginUser from '../services/LoginService';
 import { useState } from 'react';
 
-const LoginContainer = () => {
+
+const LoginContainer = ({setToken}) => {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -20,9 +21,9 @@ const LoginContainer = () => {
         if(response.status === 200) {
             const payload = await response.json();
             // Guardar el token en el local storage
-            localStorage.setItem('token', payload.token);
-            // Redirigir al usuario a la página de inicio
-            window.location.href = '/';
+            console.log(payload.token);
+            setToken(payload.token);
+            
         }
         else {
             setError(true);
